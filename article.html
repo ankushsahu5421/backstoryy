@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -91,6 +91,9 @@
             padding-top: 0.5rem; padding-bottom: 0.5rem;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
+        .dark #main-header.shrunk {
+             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+        }
         #main-header.shrunk .header-logo { font-size: 1.875rem; }
         #main-header.shrunk .header-title { font-size: 1.25rem; }
 
@@ -163,6 +166,16 @@
         }
         .content-section.animate-in {
             animation: fade-slide-in 0.5s ease-out forwards;
+        }
+        
+        /* 🔷 Style for images in articles */
+        .prose img {
+            width: 75%;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 0.75rem;
+            margin-top: 1.5em;
+            margin-bottom: 1.5em;
         }
     </style>
 </head>
@@ -256,16 +269,19 @@
             // --- END THEME LOGIC ---
 
             const standardThemes = {
-                introduction: { main: '#3b82f6', icon: 'landmark' },
-                growth: { main: '#22c55e', icon: 'line-chart' },             
-                acheivements: { main: '#0891b2', icon: 'trophy' },
-                // f97316 - Some color.
+                // Potential color : #F59E0B - Amber ; #6366F1 - Indigo
+                introduction: { main: '#0891b2', icon: 'landmark' },                
+                growth: { main: '#22c55e', icon: 'line-chart' },
+                achievements: { main: '#3b82f6', icon: 'trophy' },
+                // Optional Color : #3b82f6
             };
             const dynamicThemes = [
-                { main: '#7c3aed', icon: 'cpu' },
-                { main: '#db2777', icon: 'film' },
-                { main: '#0891b2', icon: 'book-open' },
+                { main: '#db2777', icon: 'list-checks' },                
+                { main: '#F59E0B', icon: 'book-open' }, // Amber or current color. 
+
+                // Currently Not Used in the .md file.
                 { main: '#65a30d', icon: 'leaf' },
+                { main: '#db2777', icon: 'film' },
             ];
             const defaultIcon = 'file-text';
             let sectionsWithThemes = [];
@@ -285,8 +301,8 @@
             applyDynamicFontSize(decodedTitle);
 
             async function init() {
-                // Apply saved theme on initial load before doing anything else
-                const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                // Apply saved theme on initial load, defaulting to dark.
+                const savedTheme = localStorage.getItem('theme') || 'dark';
                 applyTheme(savedTheme);
 
                 try {
@@ -345,10 +361,10 @@
             function assignThemesToSections(sectionsToTheme) {
                 let dynamicThemeIndex = 0;
                 const keywordToIconMap = {
-                    technology: 'cpu',
-                    reasons: 'film',
+                    reasons: 'list-checks',                    
                     lessons: 'book-open',
-                    environment: 'leaf',
+                    // Currently Not Used in the .md file.
+                    entertainment: 'film',
                 };
 
                 return sectionsToTheme.map(section => {
