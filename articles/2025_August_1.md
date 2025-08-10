@@ -2,7 +2,7 @@
 
 ## Brand Overview
 
-![82°E logo](./../thumbnails/2025_August_1.jpg "82°E Logo")
+![82°E logo](./../thumbnails/2025_August_1.png "82°E Logo")
 
 82°E is a modern Indian self-care brand, co-founded in 2021 by Bollywood star Deepika Padukone and entrepreneur Jigar Shah. With Mumbai as its headquarters, the brand's name references the Indian standard meridian, underscoring its Indian identity and international aspirations.
 
@@ -110,4 +110,5 @@
 - 82°E stands as a cautionary tale for startups to master brand essentials before relying on hype.
 
 > **Note:** Success in the modern beauty/self-care industry demands far more than star power and capital—core brand and market strategies are non-negotiable.
+
 
