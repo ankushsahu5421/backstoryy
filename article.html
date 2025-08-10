@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article | BackStoryy</title>
+
+    <!-- Icon -->
+    <link rel="icon" type="image/svg+xml" href="backstoryy.png">
+
+    <!-- Tailwind CSS with Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Marked.js for Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        /* --- CSS Variables for Theming --- */
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-sidebar: linear-gradient(to top, #ffffff, #f9fafb);
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --border-color: #e5e7eb;
+            --pattern-fill: #d1d5db;
+            --theme-color-main: #4b5563; /* Default gray */
+            --theme-color-bg: #e5e7eb; /* Background for glow effect */
+            
+            /* Professional brand colors for light/dark modes */
+            --brand-color-light: #115e59; /* The original, professional teal (teal-800) */
+            --brand-color-dark: #2dd4bf;  /* A clear, vibrant teal for readability in dark mode (teal-400) */
+
+            /* Dedicated CSS variables for the article title color */
+            --title-color-light: #f97316; /* orange-500 */
+            --title-color-dark: #a3e635;  /* lime-400 */
+        }
+
+        .dark {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --bg-sidebar: linear-gradient(to top, #1f2937, #1a2431);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border-color: #374151;
+            --pattern-fill: #4b5563;
+            --theme-color-bg: #374151; /* Dark background for glow effect */
+        }
+
+        .font-title { font-family: 'Playfair Display', serif; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='var(--pattern-fill)' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            transition: background-color 0.4s, color 0.4s;
+        }
+
+        /* --- Border Glow Effect --- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            box-shadow: inset 0 0 0 5px var(--theme-color-main);
+            transition: box-shadow 0.4s ease-in-out;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* --- Preloader & Header Animations --- */
+        #preloader { background-color: var(--bg-secondary); transition: opacity 0.6s ease-in-out; }
+        #preloader.hidden { opacity: 0; pointer-events: none; }
+        .preloader-logo { animation: pop-in 0.8s ease-out forwards; }
+        .preloader-title { opacity: 0; animation: fade-in-up 0.8s 1s ease-in-out forwards; }
+        @keyframes pop-in { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fade-in-up { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        .main-content-wrapper { opacity: 0; transition: opacity 0.6s ease-in-out; }
+        .main-content-wrapper.visible { opacity: 1; }
+        #main-header { transition: padding 0.4s ease-in-out, box-shadow 0.4s ease-in-out; background-color: var(--bg-secondary); }
+        #main-header .header-logo, #main-header .header-title { transition: font-size 0.4s ease-in-out, color 0.4s ease-in-out; transform: translateZ(0); }
+        #main-header.shrunk {
+            padding-top: 0.5rem; padding-bottom: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        #main-header.shrunk .header-logo { font-size: 1.875rem; }
+        #main-header.shrunk .header-title { font-size: 1.25rem; }
+
+        /* --- Professional Brand Title Theming --- */
+        .brand-title {
+            color: var(--brand-color-light);
+            transition: color 0.4s ease-in-out;
+        }
+        .dark .brand-title {
+            color: var(--brand-color-dark);
+        }
+
+        /* --- Article Title Theming using CSS Variables --- */
+        #article-main-title {
+            color: var(--title-color-light);
+        }
+        .dark #article-main-title {
+            color: var(--title-color-dark);
+        }
+
+
+        /* --- Sidebar Styles --- */
+        #sidebar {
+            background-image: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            transition: width 0.4s ease-in-out, background-image 0.4s, border-color 0.4s;
+            width: 18rem;
+        }
+        .sidebar-item {
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            transform-origin: center left;
+        }
+        .sidebar-item:not(.active):hover {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .sidebar-item.active {
+            background-color: var(--theme-color-main);
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px -3px var(--theme-color-bg);
+        }
+        .sidebar-item.active .icon { color: white !important; }
+
+        /* --- Collapsed Sidebar Styles --- */
+        #layout-wrapper.sidebar-collapsed #sidebar { width: 6rem; }
+        #layout-wrapper.sidebar-collapsed .sidebar-item-title { display: none; }
+        #layout-wrapper.sidebar-collapsed #sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+        }
+        #layout-wrapper.sidebar-collapsed .sidebar-item { padding: 0.5rem; }
+        #layout-wrapper.sidebar-collapsed .sidebar-item .icon { width: 2rem; height: 2rem; }
+        #layout-wrapper.sidebar-collapsed #sidebar-nav > .sidebar-item + .sidebar-item { margin-top: 1.25rem; }
+        #layout-wrapper.sidebar-collapsed #sidebar-footer { justify-content: center; }
+        #layout-wrapper.sidebar-collapsed #collapse-btn-text { display: none; }
+
+        /* --- Dark Mode Toggle --- */
+        #theme-toggle-btn { transition: all 0.3s ease; color: var(--text-secondary); }
+        .dark #theme-toggle-btn .sun-icon { display: block; }
+        .dark #theme-toggle-btn .moon-icon { display: none; }
+        #theme-toggle-btn .sun-icon { display: none; }
+
+        /* --- Content Animation --- */
+        @keyframes fade-slide-in {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .content-section.animate-in {
+            animation: fade-slide-in 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 flex flex-col items-center justify-center z-50 p-4">
+        <!-- Using .brand-title class for theming -->
+        <h1 class="font-title text-7xl font-bold text-inherit text-teal-800 brand-title">BackStoryy</h1>
+        <h2 id="preloader-title" class="preloader-title mt-4 text-4xl font-semibold text-center" style="color: var(--text-secondary)"></h2>
+    </div>
+
+    <!-- Wrapper for main content to control visibility -->
+    <div class="main-content-wrapper h-screen flex flex-col">
+        <!-- Header Section -->
+        <header id="main-header" class="z-10 sticky top-0 py-6">
+            <div class="max-w-7xl mx-auto px-4 relative flex justify-center items-center">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                    <!-- Using .brand-title class for theming -->
+                    <a href="index.html" class="font-title text-4xl font-bold text-inherit text-teal-800 header-logo brand-title">BackStoryy</a>
+                </div>
+                <div class="text-center overflow-hidden">
+                    <!-- Controlled by CSS variables -->
+                    <h2 id="article-main-title" class="text-2xl font-bold header-title whitespace-nowrap">Weekly Article</h2>
+                </div>
+                <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                    <button id="theme-toggle-btn" class="p-2 rounded-full hover:bg-gray-500/10" aria-label="Toggle theme">
+                        <i data-lucide="moon" class="moon-icon"></i>
+                        <i data-lucide="sun" class="sun-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout Container -->
+        <div id="layout-wrapper" class="flex-grow flex overflow-hidden">
+            <!-- Left Sidebar -->
+            <aside id="sidebar" class="h-full flex flex-col justify-between shadow-md p-4">
+                <nav id="sidebar-nav" class="p-2 md:p-4 space-y-3 mt-16">
+                    <!-- Sidebar items will be dynamically inserted here -->
+                </nav>
+                 <div id="sidebar-footer" class="p-2 flex items-center justify-end">
+                    <button id="collapse-btn" class="flex items-center gap-3 p-2 rounded-lg w-full" style="color: var(--text-secondary)" hover:bg-gray-500/10">
+                        <i data-lucide="chevrons-left"></i>
+                        <span id="collapse-btn-text" class="font-semibold">Collapse</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Right Content Area -->
+            <main id="content-area" class="flex-grow h-full overflow-y-auto p-6 md:p-10">
+                <!-- Article content will be dynamically inserted here -->
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const root = document.documentElement;
+            const mainTitleElement = document.getElementById('article-main-title');
+            const preloaderTitleElement = document.getElementById('preloader-title');
+            const preloader = document.getElementById('preloader');
+            const mainContentWrapper = document.querySelector('.main-content-wrapper');
+            const mainHeader = document.getElementById('main-header');
+            const contentArea = document.getElementById('content-area');
+            const sidebarNav = document.getElementById('sidebar-nav');
+            const layoutWrapper = document.getElementById('layout-wrapper');
+            const collapseBtn = document.getElementById('collapse-btn');
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+
+            // --- THEME LOGIC ---
+            const applyTheme = (theme) => {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', theme);
+                lucide.createIcons();
+                 // After theme change, re-check active article for prose inversion
+                const activeArticleProse = contentArea.querySelector('.content-section:not(.hidden) .prose');
+                if (activeArticleProse) {
+                    activeArticleProse.classList.toggle('prose-invert', document.documentElement.classList.contains('dark'));
+                }
+            };
+
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+                applyTheme(currentTheme);
+            });
+            // --- END THEME LOGIC ---
+
+            const standardThemes = {
+                introduction: { main: '#3b82f6', icon: 'landmark' },
+                growth: { main: '#22c55e', icon: 'line-chart' },             
+                acheivements: { main: '#0891b2', icon: 'trophy' },
+                // f97316 - Some color.
+            };
+            const dynamicThemes = [
+                { main: '#7c3aed', icon: 'cpu' },
+                { main: '#db2777', icon: 'film' },
+                { main: '#0891b2', icon: 'book-open' },
+                { main: '#65a30d', icon: 'leaf' },
+            ];
+            const defaultIcon = 'file-text';
+            let sectionsWithThemes = [];
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleFile = urlParams.get('file');
+            const articleTitle = urlParams.get('title');
+
+            if (!articleFile || !articleTitle) {
+                handleFatalError("Article file or title not specified in URL.");
+                return; 
+            }
+            
+            const decodedTitle = decodeURIComponent(articleTitle);
+            mainTitleElement.textContent = decodedTitle;
+            preloaderTitleElement.textContent = decodedTitle;
+            applyDynamicFontSize(decodedTitle);
+
+            async function init() {
+                // Apply saved theme on initial load before doing anything else
+                const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                applyTheme(savedTheme);
+
+                try {
+                    const markdownText = await fetchMarkdown(articleFile);
+                    const sections = parseMarkdownIntoSections(markdownText);
+                    if (sections.length === 0) throw new Error("No valid content sections found.");
+                    
+                    sectionsWithThemes = assignThemesToSections(sections);
+                    generateSidebar(sectionsWithThemes);
+                    generateContent(sectionsWithThemes);
+                    setupEventListeners();
+                    
+                    sidebarNav.querySelector('.sidebar-item')?.click();
+                } catch (error) {
+                    handleFatalError(error.message);
+                }
+
+                setTimeout(() => {
+                    preloader.classList.add('hidden');
+                    mainContentWrapper.classList.add('visible');
+                }, 2400);
+            }
+            
+            function handleFatalError(message) {
+                console.error(message);
+                contentArea.innerHTML = `<div class="text-center p-8 rounded-lg" style="background-color: #fef2f2; color: #991b1b"><h2 class="text-2xl font-bold">Error</h2><p class="mt-2">${message}</p></div>`;
+                if (document.documentElement.classList.contains('dark')) {
+                     contentArea.querySelector('div').style.backgroundColor = '#450a0a';
+                     contentArea.querySelector('div').style.color = '#fca5a5';
+                }
+                preloader.classList.add('hidden');
+                mainContentWrapper.classList.add('visible');
+            }
+            
+            async function fetchMarkdown(filename) {
+                const response = await fetch(`articles/${filename}`);
+                if (!response.ok) throw new Error(`Could not fetch article file: ${filename}`);
+                return await response.text();
+            }
+
+            function parseMarkdownIntoSections(markdown) {
+                const tokens = marked.lexer(markdown);
+                const sections = [];
+                let currentSection = null;
+                for (const token of tokens) {
+                    if (token.type === 'heading' && token.depth === 1) {
+                        currentSection = { title: token.text.trim(), content: '' };
+                        sections.push(currentSection);
+                    } else if (currentSection) {
+                        currentSection.content += token.raw;
+                    }
+                }
+                return sections.filter(s => s.content.trim() !== '');
+            }
+            
+            function assignThemesToSections(sectionsToTheme) {
+                let dynamicThemeIndex = 0;
+                const keywordToIconMap = {
+                    technology: 'cpu',
+                    reasons: 'film',
+                    lessons: 'book-open',
+                    environment: 'leaf',
+                };
+
+                return sectionsToTheme.map(section => {
+                    const lowerTitle = section.title.toLowerCase();
+                    let assignedTheme = null;
+                    let assignedIcon = defaultIcon;
+
+                    for (const key in standardThemes) {
+                        if (lowerTitle.includes(key)) {
+                            assignedTheme = standardThemes[key].main;
+                            assignedIcon = standardThemes[key].icon;
+                            break;
+                        }
+                    }
+
+                    if (!assignedTheme) {
+                        for (const key in keywordToIconMap) {
+                            if (lowerTitle.includes(key)) {
+                                assignedIcon = keywordToIconMap[key];
+                                break;
+                            }
+                        }
+                        assignedTheme = dynamicThemes[dynamicThemeIndex].main;
+                        dynamicThemeIndex = (dynamicThemeIndex + 1) % dynamicThemes.length;
+                    }
+                    return { ...section, themeColor: assignedTheme, icon: assignedIcon };
+                });
+            }
+
+            function generateSidebar(sections) {
+                sidebarNav.innerHTML = sections.map((section, index) => `
+                    <div class="sidebar-item flex items-center gap-4 p-3 rounded-lg cursor-pointer" data-index="${index}">
+                        <i data-lucide="${section.icon}" class="icon"></i>
+                        <h3 class="font-bold text-lg sidebar-item-title">${section.title}</h3>
+                    </div>
+                `).join('');
+            }
+
+            function generateContent(sections) {
+                contentArea.innerHTML = sections.map((section, index) => {
+                    const htmlContent = marked.parse(section.content);
+                    return `
+                    <article id="content-${index}" class="content-section hidden">
+                        <div class="prose prose-lg max-w-none">
+                            ${htmlContent}
+                        </div>
+                    </article>`;
+                }).join('');
+            }
+
+            function setupEventListeners() {
+                sidebarNav.addEventListener('click', (e) => {
+                    const selector = e.target.closest('.sidebar-item');
+                    if (!selector || selector.classList.contains('active')) return;
+
+                    const index = selector.dataset.index;
+                    const activeSection = sectionsWithThemes[index];
+                    
+                    root.style.setProperty('--theme-color-main', activeSection.themeColor);
+                    
+                    sidebarNav.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+                    selector.classList.add('active');
+                    
+                    const currentVisible = contentArea.querySelector('.content-section:not(.hidden)');
+                    const newSection = document.getElementById(`content-${index}`);
+
+                    if (currentVisible) {
+                        currentVisible.classList.add('hidden');
+                        currentVisible.classList.remove('animate-in');
+                    }
+
+                    if (newSection) {
+                        newSection.classList.remove('hidden');
+                        void newSection.offsetWidth; 
+                        newSection.classList.add('animate-in');
+                    }
+                    
+                    const activeArticleProse = contentArea.querySelector(`#content-${index} .prose`);
+                    if(activeArticleProse) {
+                        activeArticleProse.classList.toggle('prose-invert', document.documentElement.classList.contains('dark'));
+                    }
+                });
+
+                collapseBtn.addEventListener('click', () => {
+                    layoutWrapper.classList.toggle('sidebar-collapsed');
+                    const icon = collapseBtn.querySelector('i');
+                    icon.setAttribute('data-lucide', layoutWrapper.classList.contains('sidebar-collapsed') ? 'chevrons-right' : 'chevrons-left');
+                    lucide.createIcons();
+                });
+
+                contentArea.addEventListener('scroll', () => mainHeader.classList.toggle('shrunk', contentArea.scrollTop > 50));
+                
+                lucide.createIcons();
+            }
+            
+            function applyDynamicFontSize(title) {
+                const titleLength = title.length;
+                const MAX_FONT_SIZE_REM = 2.25;
+                const MIN_FONT_SIZE_REM = 1.5;
+                const SHORTEST_TITLE_LENGTH = 10;
+                const LONGEST_TITLE_LENGTH = 50;
+                let initialFontSizeRem = MAX_FONT_SIZE_REM;
+                if (titleLength > SHORTEST_TITLE_LENGTH) {
+                    if (titleLength >= LONGEST_TITLE_LENGTH) {
+                        initialFontSizeRem = MIN_FONT_SIZE_REM;
+                    } else {
+                        const range = LONGEST_TITLE_LENGTH - SHORTEST_TITLE_LENGTH;
+                        const progress = (titleLength - SHORTEST_TITLE_LENGTH) / range;
+                        initialFontSizeRem = MAX_FONT_SIZE_REM - (progress * (MAX_FONT_SIZE_REM - MIN_FONT_SIZE_REM));
+                    }
+                }
+                mainTitleElement.style.fontSize = `${initialFontSizeRem}rem`;
+            }
+
+            // Start the application
+            init();
+        });
+    </script>
+</body>
+</html>
