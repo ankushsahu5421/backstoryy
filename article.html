@@ -553,24 +553,20 @@
 
             // Scroll "charge" needed to show the preview of the next/previous section.
             // Lower value means the preview appears faster.
-            previewThreshold: 2000,
+            previewThreshold: 40,
 
             // Scroll "charge" needed to trigger the navigation.
             // Lower value means less scrolling is needed to change sections.
-            // When changed look for the maxCharge too.
-            navigationThreshold: 120,            
-            
-            // An upper limit for the charge
-            maxCharge: 200, 
+            navigationThreshold: 130,
 
             // Multiplier for how quickly the scroll "charge" accumulates. Higher is faster.
-            chargeAccumulationFactor: 0.2,
+            chargeAccumulationFactor: 0.6,
 
             // Delay before the scroll "charge" resets after the user stops scrolling (in milliseconds).
-            chargeResetDelay: 200,
+            chargeResetDelay: 250,
 
             // How long the navigation hint (up/down arrow) stays visible after a partial scroll (in milliseconds).
-            persistentIndicatorTimeout: 3000,
+            persistentIndicatorTimeout: 2000,
         };
 
         const root                = document.documentElement;
@@ -812,12 +808,8 @@
                 
             }, animationConfig.articleTransitionDuration);
 
-            // Set a cooldown for the entire navigation process and reset the elastic state
-            // This is the ideal place to reset the state to prevent the "jump"
-            setTimeout(() => {
-                isNavigating = false;
-                resetElasticState(false); // Reset without animation after navigation is complete
-            }, animationConfig.navigationCooldown);
+            // Set a cooldown for the entire navigation process to prevent spamming
+            setTimeout(() => { isNavigating = false; }, animationConfig.navigationCooldown);
         }
 
         function showUserHint() {
@@ -841,7 +833,7 @@
             
             let elasticState = {
                charge: 0,
-                // marCharge used to be here !! See ⭐ variable above
+               maxCharge: 200, // An upper limit for the charge
                direction: 0,
                isCharging: false,
                isElastic: false,
@@ -977,7 +969,7 @@
                
                setTimeout(() => {
                    navigate(dir, nextItem);
-                   // The reset is now handled inside the navigate function to prevent the jump
+                   resetElasticState(false);
                }, 100);
             }
 
